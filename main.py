@@ -17,6 +17,9 @@ moving_right = False
 moving_up = False
 moving_down = False
 
+#define font
+font = pygame.font.Font('assets/fonts/AtariClassic.ttf', 20)
+
 #helper function to scale images
 def scale_img(image, scale):
     size = image.get_width()*scale, image.get_height()*scale
@@ -43,14 +46,38 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+#damage text class
+class DamageText(pygame.sprite.Sprite):
+    def __init__(self, x, y, damage, color):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = font.render(str(damage), True, color)
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.counter = 0
+        
+    def update(self):
+        #move damage text up
+        self.rect.y -= 1
+        #delete the counter after a few seconds
+        self.counter += 1
+        if self.counter > 20 or self.rect.y < -20:
+            self.kill()
 
 #create player
-player = Character(100, 100, mob_animations, 0)
+player = Character(100, 100, 100, mob_animations, 0)
+
+#create enemy
+enemy = Character(200, 300, 100, mob_animations, 1)
 
 #create player's weapon
 bow = Weapon(bow_img, arrow_img)
 
+#create empty enemy list
+enemy_list = []
+enemy_list.append(enemy)
+
 # create sprite groups
+damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
 
 # main game loop
@@ -76,18 +103,27 @@ while run:
     player.move(dx, dy)
     
     #update player animation
+    for enemy in enemy_list:
+        enemy.update()
     player.update()
     arrow = bow.update(player)
     if arrow:
         arrow_group.add(arrow)
     for arrow in arrow_group:
-        arrow.update()
+        damage, damage_pos = arrow.update(enemy_list)
+        if damage:
+            damage_text = DamageText(damage_pos.centerx, damage_pos.y, damage, constants.RED)
+            damage_text_group.add(damage_text)
+    damage_text_group.update()
     
     #draw player on screen
+    for enemy in enemy_list:
+        enemy.draw(screen)
     player.draw(screen)
     bow.draw(screen)
     for arrow in arrow_group:
         arrow.draw(screen)
+    damage_text_group.draw(screen)
     
     #event handler
     for event in pygame.event.get():
@@ -114,6 +150,8 @@ while run:
                 moving_up = False
             if event.key == pygame.K_s:
                 moving_down = False
+    
+    print(enemy.health)
     
     pygame.display.update()
 
