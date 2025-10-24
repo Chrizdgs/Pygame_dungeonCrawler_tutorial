@@ -25,9 +25,15 @@ def scale_img(image, scale):
     size = image.get_width()*scale, image.get_height()*scale
     return pygame.transform.scale(image, size)
 
+#load heart images
+hearth_empty = scale_img(pygame.image.load('assets/images/items/heart_empty.png').convert_alpha(), constants.ITEM_SCALE)
+hearth_half = scale_img(pygame.image.load('assets/images/items/heart_half.png').convert_alpha(), constants.ITEM_SCALE)
+hearth_full = scale_img(pygame.image.load('assets/images/items/heart_full.png').convert_alpha(), constants.ITEM_SCALE)
+
 #load weapon images
 bow_img = scale_img(pygame.image.load('assets/images/weapons/bow.png').convert_alpha(), constants.WEAPON_SCALE)
 arrow_img = scale_img(pygame.image.load('assets/images/weapons/arrow.png').convert_alpha(), constants.WEAPON_SCALE)
+
 #load character images
 mob_animations = []
 mob_types = ['elf','imp','skeleton','goblin','muddy','tiny_zombie','big_demon']
@@ -45,6 +51,21 @@ for mob in mob_types:
             temp_list.append(img)    
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
+
+#function for displaying game info
+def draw_info():
+    pygame.draw.rect(screen, constants.PANEL, (0, 0, constants.SCREEN_WIDTH, 50))
+    pygame.draw.line(screen, constants.WHITE, (0, 50), (constants.SCREEN_WIDTH, 50))
+    #draw lives
+    half_hearth_drawn = False
+    for i in range(5):
+        if player.health >= ((i + 1) * 20):
+            screen.blit(hearth_full, (10 + i * 50, 0))
+        elif (player.health % 20 > 0) and not half_hearth_drawn:
+            screen.blit(hearth_half, (10 + i * 50, 0))
+            half_hearth_drawn = True
+        else:
+            screen.blit(hearth_empty, (10 + i * 50, 0))
 
 #damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -124,6 +145,7 @@ while run:
     for arrow in arrow_group:
         arrow.draw(screen)
     damage_text_group.draw(screen)
+    draw_info()
     
     #event handler
     for event in pygame.event.get():

@@ -2,10 +2,14 @@ FPS = 60 #frames per second
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 SCALE = 3
 WEAPON_SCALE = 1.5
+ITEM_SCALE = 3
 SPEED = 5
 ARROW_SPEED = 10
 OFFSET = 12
 
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
 BLUE = (0, 128, 255)
 RED = (255, 0, 0)
-BG = (32, 32, 32) #Background color
+BG = (40, 25, 25) #Background color
+PANEL = (50, 50, 50)
