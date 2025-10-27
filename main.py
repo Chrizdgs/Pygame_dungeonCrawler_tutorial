@@ -2,6 +2,7 @@ import pygame
 import constants
 from character import Character
 from weapon import Weapon
+from items import Item
 
 pygame.init()
 
@@ -30,6 +31,15 @@ hearth_empty = scale_img(pygame.image.load('assets/images/items/heart_empty.png'
 hearth_half = scale_img(pygame.image.load('assets/images/items/heart_half.png').convert_alpha(), constants.ITEM_SCALE)
 hearth_full = scale_img(pygame.image.load('assets/images/items/heart_full.png').convert_alpha(), constants.ITEM_SCALE)
 
+#load coin images
+coin_images = []
+for x in range(4):
+    img = scale_img(pygame.image.load(f'assets/images/items/coin_f{x}.png').convert_alpha(), constants.ITEM_SCALE)
+    coin_images.append(img)
+    
+#load poton image
+red_potion = scale_img(pygame.image.load('assets/images/items/potion_red.png').convert_alpha(), constants.POTION_SCALE)
+
 #load weapon images
 bow_img = scale_img(pygame.image.load('assets/images/weapons/bow.png').convert_alpha(), constants.WEAPON_SCALE)
 arrow_img = scale_img(pygame.image.load('assets/images/weapons/arrow.png').convert_alpha(), constants.WEAPON_SCALE)
@@ -52,6 +62,11 @@ for mob in mob_types:
         animation_list.append(temp_list)
     mob_animations.append(animation_list)
 
+#function for outputting text onto the screen
+def draw_text(text, font, text_color, x, y):
+    img = font.render(text, True, text_color)
+    screen.blit(img, (x, y))
+
 #function for displaying game info
 def draw_info():
     pygame.draw.rect(screen, constants.PANEL, (0, 0, constants.SCREEN_WIDTH, 50))
@@ -66,6 +81,9 @@ def draw_info():
             half_hearth_drawn = True
         else:
             screen.blit(hearth_empty, (10 + i * 50, 0))
+            
+    #show score
+    draw_text(f'x{player.score}', font, constants.WHITE, constants.SCREEN_WIDTH - 105, 15)
 
 #damage text class
 class DamageText(pygame.sprite.Sprite):
@@ -100,6 +118,15 @@ enemy_list.append(enemy)
 # create sprite groups
 damage_text_group = pygame.sprite.Group()
 arrow_group = pygame.sprite.Group()
+item_group = pygame.sprite.Group()
+
+score_coin = Item(constants.SCREEN_WIDTH - 115, 23, 0, coin_images)
+item_group.add(score_coin)
+
+potion = Item(200, 200, 1, [red_potion])
+item_group.add(potion)
+coin = Item(400, 400, 0, coin_images)
+item_group.add(coin)
 
 # main game loop
 run = True
@@ -136,6 +163,7 @@ while run:
             damage_text = DamageText(damage_pos.centerx, damage_pos.y, damage, constants.RED)
             damage_text_group.add(damage_text)
     damage_text_group.update()
+    item_group.update(player)
     
     #draw player on screen
     for enemy in enemy_list:
@@ -145,7 +173,9 @@ while run:
     for arrow in arrow_group:
         arrow.draw(screen)
     damage_text_group.draw(screen)
+    item_group.draw(screen)
     draw_info()
+    score_coin.draw(screen)
     
     #event handler
     for event in pygame.event.get():
