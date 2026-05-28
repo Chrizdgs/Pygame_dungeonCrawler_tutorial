@@ -5,7 +5,7 @@ from weapon import Weapon
 from items import Item
 
 pygame.init()
-
+#just a test comment to check if github is working
 screen = pygame.display.set_mode((constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT))
 pygame.display.set_caption('Dungeon Crawler')
 
